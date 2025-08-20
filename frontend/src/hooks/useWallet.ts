@@ -1,104 +1,246 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { Wallet } from '../types';
-
-declare global {
-  interface Window {
-    freighter?: {
-      isConnected: () => Promise<boolean>;
-      getPublicKey: () => Promise<string>;
-      signTransaction: (transaction: any) => Promise<any>;
-      signAndSubmitTransaction: (transaction: any) => Promise<any>;
-      on: (event: string, callback: (data: any) => void) => void;
-      off: (event: string, callback: (data: any) => void) => void;
-    };
-  }
-}
+import type { Wallet, NetworkInfo } from '../types';
+import {
+  isConnected,
+  isAllowed,
+  setAllowed,
+  requestAccess,
+  getAddress,
+  getNetwork,
+  getNetworkDetails,
+  signTransaction,
+  signAuthEntry,
+  signMessage,
+  addToken,
+  WatchWalletChanges,
+} from '@stellar/freighter-api';
 
 export const useWallet = () => {
   const [wallet, setWallet] = useState<Wallet | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
+  const [isWalletConnected, setIsWalletConnected] = useState(false);
   const [connectionError, setConnectionError] = useState<string | null>(null);
   const [isFreighterDetected, setIsFreighterDetected] = useState<boolean | null>(null);
+  const [networkInfo, setNetworkInfo] = useState<NetworkInfo | null>(null);
 
-  const checkFreighterAvailability = useCallback(() => {
+  const checkFreighterAvailability = useCallback(async () => {
     console.log('Checking Freighter availability...');
-    if (window.freighter) {
-      console.log('✅ Freighter detected!');
-      setIsFreighterDetected(true);
-      return true;
-    } else {
-      console.log('❌ Freighter not detected yet');
+    try {
+      const connected = await isConnected();
+      if (connected.isConnected) {
+        console.log('✅ Freighter detected and connected!');
+        setIsFreighterDetected(true);
+        return true;
+      } else {
+        console.log('❌ Freighter detected but not connected');
+        setIsFreighterDetected(true);
+        return false;
+      }
+    } catch (error) {
+      console.log('❌ Freighter not detected');
       setIsFreighterDetected(false);
       return false;
+    }
+  }, []);
+
+  const getNetworkInformation = useCallback(async (): Promise<NetworkInfo | null> => {
+    try {
+      const networkDetails = await getNetworkDetails();
+      if (networkDetails.error) {
+        console.error('Error getting network details:', networkDetails.error);
+        return null;
+      }
+      
+      const networkInfo: NetworkInfo = {
+        network: networkDetails.network,
+        networkPassphrase: networkDetails.networkPassphrase,
+        networkUrl: networkDetails.networkUrl,
+        sorobanRpcUrl: networkDetails.sorobanRpcUrl,
+      };
+      
+      setNetworkInfo(networkInfo);
+      return networkInfo;
+    } catch (error) {
+      console.error('Error getting network information:', error);
+      return null;
     }
   }, []);
 
   const checkConnection = useCallback(async () => {
     console.log('Checking wallet connection...');
     
-    // First check if Freighter is available
-    if (!checkFreighterAvailability()) {
-      setConnectionError('Freighter wallet extension not found. Please install it first.');
-      return;
-    }
-
     try {
-      console.log('Freighter detected, checking connection...');
-      const connected = await window.freighter!.isConnected();
+      const connected = await isConnected();
       console.log('Connection status:', connected);
       
-      if (connected) {
-        const publicKey = await window.freighter!.getPublicKey();
+      if (connected.isConnected) {
+        const addressObj = await getAddress();
+        if (addressObj.error) {
+          throw new Error(addressObj.error);
+        }
+        
+        const publicKey = addressObj.address;
         console.log('Public key retrieved:', publicKey);
-        setWallet({
+        
+        const networkInfo = await getNetworkInformation();
+        
+        const walletInstance: Wallet = {
           publicKey,
           isConnected: true,
-          signTransaction: window.freighter!.signTransaction,
-          signAndSubmitTransaction: window.freighter!.signAndSubmitTransaction,
-        });
-        setIsConnected(true);
+          network: networkInfo,
+          signTransaction: async (xdr: string, opts?: { network?: string; networkPassphrase?: string; address?: string }) => {
+            const result = await signTransaction(xdr, opts);
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            return result;
+          },
+          signAuthEntry: async (authEntryXdr: string, opts: { address: string }) => {
+            const result = await signAuthEntry(authEntryXdr, opts);
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            return result;
+          },
+          signMessage: async (message: string, opts: { address: string }) => {
+            const result = await signMessage(message, opts);
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            return result;
+          },
+          addToken: async (params: { contractId: string; networkPassphrase?: string }) => {
+            const result = await addToken(params);
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            return result;
+          },
+          getNetwork: async () => {
+            const result = await getNetwork();
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            return {
+              network: result.network,
+              networkPassphrase: result.networkPassphrase,
+            };
+          },
+          getNetworkDetails: async () => {
+            const result = await getNetworkDetails();
+            if (result.error) {
+              throw new Error(result.error);
+            }
+            return {
+              network: result.network,
+              networkPassphrase: result.networkPassphrase,
+              networkUrl: result.networkUrl,
+              sorobanRpcUrl: result.sorobanRpcUrl,
+            };
+          },
+        };
+        
+        setWallet(walletInstance);
+        setIsWalletConnected(true);
         setConnectionError(null);
       } else {
         console.log('Wallet not connected');
         setWallet(null);
-        setIsConnected(false);
+        setIsWalletConnected(false);
         setConnectionError('Wallet not connected. Please unlock Freighter and try again.');
       }
     } catch (error) {
       console.error('Error checking wallet connection:', error);
       setWallet(null);
-      setIsConnected(false);
+      setIsWalletConnected(false);
       setConnectionError(`Connection check failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }, [checkFreighterAvailability]);
+  }, [getNetworkInformation]);
 
   const connect = useCallback(async () => {
     console.log('Attempting to connect wallet...');
     setConnectionError(null);
     
-    // Check Freighter availability before attempting connection
-    if (!checkFreighterAvailability()) {
-      const errorMsg = 'Please install Freighter wallet extension';
-      console.error(errorMsg);
-      setConnectionError(errorMsg);
-      alert(errorMsg);
-      return;
-    }
-
     try {
-      console.log('Getting public key from Freighter...');
-      const publicKey = await window.freighter!.getPublicKey();
+      // Check if app is allowed
+      const allowed = await isAllowed();
+      if (!allowed.isAllowed) {
+        console.log('App not allowed, requesting access...');
+        const setAllowedResult = await setAllowed();
+        if (!setAllowedResult.isAllowed) {
+          throw new Error('User rejected app access');
+        }
+      }
+      
+      // Request access to get public key
+      console.log('Requesting access to wallet...');
+      const accessObj = await requestAccess();
+      if (accessObj.error) {
+        throw new Error(accessObj.error);
+      }
+      
+      const publicKey = accessObj.address;
       console.log('Successfully got public key:', publicKey);
+      
+      const networkInfo = await getNetworkInformation();
       
       const walletInstance: Wallet = {
         publicKey,
         isConnected: true,
-        signTransaction: window.freighter!.signTransaction,
-        signAndSubmitTransaction: window.freighter!.signAndSubmitTransaction,
+        network: networkInfo,
+        signTransaction: async (xdr: string, opts?: { network?: string; networkPassphrase?: string; address?: string }) => {
+          const result = await signTransaction(xdr, opts);
+          if (result.error) {
+            throw new Error(result.error);
+          }
+          return result;
+          },
+        signAuthEntry: async (authEntryXdr: string, opts: { address: string }) => {
+          const result = await signAuthEntry(authEntryXdr, opts);
+          if (result.error) {
+            throw new Error(result.error);
+          }
+          return result;
+        },
+        signMessage: async (message: string, opts: { address: string }) => {
+          const result = await signMessage(message, opts);
+          if (result.error) {
+            throw new Error(result.error);
+          }
+          return result;
+        },
+        addToken: async (params: { contractId: string; networkPassphrase?: string }) => {
+          const result = await addToken(params);
+          if (result.error) {
+            throw new Error(result.error);
+          }
+          return result;
+        },
+        getNetwork: async () => {
+          const result = await getNetwork();
+          if (result.error) {
+            throw new Error(result.error);
+          }
+          return {
+            network: result.network,
+            networkPassphrase: result.networkPassphrase,
+          };
+        },
+        getNetworkDetails: async () => {
+          const result = await getNetworkDetails();
+          if (result.error) {
+            throw new Error(result.error);
+          }
+          return {
+            network: result.network,
+            networkPassphrase: result.networkPassphrase,
+            networkUrl: result.networkUrl,
+            sorobanRpcUrl: result.sorobanRpcUrl,
+          };
+        },
       };
       
       setWallet(walletInstance);
-      setIsConnected(true);
+      setIsWalletConnected(true);
       setConnectionError(null);
       console.log('Wallet connected successfully!');
     } catch (error) {
@@ -118,28 +260,47 @@ export const useWallet = () => {
       setConnectionError(errorMessage);
       alert(errorMessage);
     }
-  }, [checkFreighterAvailability]);
+  }, [getNetworkInformation]);
 
   const disconnect = useCallback(() => {
     console.log('Disconnecting wallet...');
     setWallet(null);
-    setIsConnected(false);
+    setIsWalletConnected(false);
     setConnectionError(null);
+    setNetworkInfo(null);
   }, []);
+
+  // Watch for wallet changes
+  useEffect(() => {
+    if (isFreighterDetected) {
+      const watcher = new WatchWalletChanges(3000); // Check every 3 seconds
+      
+      watcher.watch((watcherResults) => {
+        console.log('Wallet changed:', watcherResults);
+        if (watcherResults.address !== wallet?.publicKey) {
+          // Recheck connection when address changes
+          checkConnection();
+        }
+      });
+
+      return () => {
+        watcher.stop();
+      };
+    }
+  }, [isFreighterDetected, wallet?.publicKey, checkConnection]);
 
   useEffect(() => {
     console.log('useWallet hook initialized');
     
     // Initial check with a small delay to ensure extension is loaded
-    const initialCheck = setTimeout(() => {
-      checkFreighterAvailability();
+    const initialCheck = setTimeout(async () => {
+      await checkFreighterAvailability();
     }, 100);
 
     // Set up polling to check for Freighter availability
-    const availabilityCheck = setInterval(() => {
-      if (!window.freighter) {
-        checkFreighterAvailability();
-      } else {
+    const availabilityCheck = setInterval(async () => {
+      const isAvailable = await checkFreighterAvailability();
+      if (isAvailable) {
         clearInterval(availabilityCheck);
         checkConnection();
       }
@@ -152,29 +313,12 @@ export const useWallet = () => {
     };
   }, [checkFreighterAvailability, checkConnection]);
 
-  // Set up event listeners once Freighter is detected
-  useEffect(() => {
-    if (window.freighter && isFreighterDetected) {
-      const handleAccountChange = () => {
-        console.log('Account/network changed, rechecking connection...');
-        checkConnection();
-      };
-
-      window.freighter.on('accountChanged', handleAccountChange);
-      window.freighter.on('networkChanged', handleAccountChange);
-
-      return () => {
-        window.freighter.off('accountChanged', handleAccountChange);
-        window.freighter.off('networkChanged', handleAccountChange);
-      };
-    }
-  }, [isFreighterDetected, checkConnection]);
-
   return {
     wallet,
-    isConnected,
+    isConnected: isWalletConnected,
     connectionError,
     isFreighterDetected,
+    networkInfo,
     connect,
     disconnect,
   };

@@ -4,6 +4,7 @@ import { ScholarshipPoolDetails } from './components/ScholarshipPoolDetails';
 import { DonationForm } from './components/DonationForm';
 import { ApplicationForm } from './components/ApplicationForm';
 import { ProgressBar } from './components/ProgressBar';
+import { FreighterDemo } from './components/FreighterDemo';
 import { useWallet } from './hooks/useWallet';
 import { useContract } from './hooks/useContract';
 import './App.css';
@@ -59,6 +60,7 @@ function App() {
 
         <div className="header-right">
           <WalletConnect 
+            wallet={wallet}
             isConnected={isConnected}
             onConnect={connect}
             onDisconnect={disconnect}
@@ -113,6 +115,9 @@ function App() {
                 Create and manage scholarship pools, accept donations, and distribute funds to deserving students based on merit and need.
               </p>
             </div>
+
+            {/* Freighter API Demo */}
+            {wallet && <FreighterDemo wallet={wallet} />}
 
             {/* Two Panel Layout */}
             <div className="panels-container">

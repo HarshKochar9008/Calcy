@@ -333,7 +333,7 @@ body {
   align-items: center;
 }
 
-.connect-button, .disconnect-button {
+.connect-button, .disconnect-button, .add-token-button {
   background: #3b82f6;
   color: white;
   border: none;
@@ -345,14 +345,55 @@ body {
   font-size: 0.9rem;
 }
 
+.add-token-button {
+  background: #8b5cf6;
+}
+
+.add-token-button:hover {
+  background: #7c3aed;
+}
+
 .connect-button:hover, .disconnect-button:hover {
   background: #2563eb;
 }
 
 .wallet-info {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   gap: 12px;
+  min-width: 300px;
+}
+
+.wallet-details {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.wallet-address {
+  font-size: 0.85rem;
+  color: #64748b;
+  font-family: monospace;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.wallet-network {
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.network-url {
+  font-size: 0.8rem;
+  color: #9ca3af;
+  margin-top: 2px;
+  word-break: break-all;
+}
+
+.wallet-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .wallet-status.connected {
@@ -362,6 +403,172 @@ body {
   border-radius: 16px;
   font-size: 0.8rem;
   font-weight: 600;
+}
+
+/* Freighter Demo */
+.freighter-demo {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+}
+
+.freighter-demo h3 {
+  color: #1e293b;
+  margin-bottom: 20px;
+  font-size: 1.25rem;
+}
+
+.demo-section {
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.demo-section h4 {
+  color: #3b82f6;
+  margin-bottom: 16px;
+  font-size: 1rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.info-item label {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.info-item span {
+  font-size: 0.9rem;
+  color: #1e293b;
+}
+
+.monospace {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.8rem;
+  background: #f1f5f9;
+  padding: 4px 8px;
+  border-radius: 4px;
+  word-break: break-all;
+}
+
+.input-group {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.demo-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease;
+}
+
+.demo-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.demo-button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.demo-button:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.demo-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.help-text {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-style: italic;
+}
+
+.result-box {
+  margin-top: 12px;
+  padding: 12px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+}
+
+.result-box label {
+  display: block;
+  font-size: 0.8rem;
+  color: #166534;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.success-message {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+}
+
+.demo-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.clear-button {
+  background: #6b7280;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.clear-button:hover {
+  background: #4b5563;
 }
 
 /* Scholarship Pool Details */

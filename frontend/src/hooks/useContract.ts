@@ -17,7 +17,7 @@ export const useContract = (wallet: Wallet | null) => {
   const [error, setError] = useState<string | null>(null);
 
   const refreshPool = useCallback(async () => {
-    if (!wallet || !CONTRACT_ID) return;
+    if (!wallet) return;
 
     try {
       setError(null);
@@ -60,8 +60,8 @@ export const useContract = (wallet: Wallet | null) => {
   };
 
   const initializePool = useCallback(async () => {
-    if (!wallet || !CONTRACT_ID) {
-      setError('Wallet not connected or contract not configured');
+    if (!wallet) {
+      setError('Wallet not connected');
       return;
     }
 
@@ -99,7 +99,7 @@ export const useContract = (wallet: Wallet | null) => {
   }, [wallet]);
 
   const donate = useCallback(async (amount: number) => {
-    if (!wallet || !pool || !CONTRACT_ID) {
+    if (!wallet || !pool) {
       setError('Wallet not connected or pool not initialized');
       return;
     }
@@ -147,7 +147,7 @@ export const useContract = (wallet: Wallet | null) => {
     financial_need_score: number;
     essay_hash: string;
   }) => {
-    if (!wallet || !pool || !CONTRACT_ID) {
+    if (!wallet || !pool) {
       setError('Wallet not connected or pool not initialized');
       return;
     }
