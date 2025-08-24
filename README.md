@@ -2,6 +2,18 @@
 
 A hackathon-ready MVP dApp on Stellar using Soroban smart contracts (Rust) and a React frontend with Soroban SDK + Freighter wallet.
 
+## 🚨 Current Status
+
+**The application is ready for setup and deployment!** 
+
+- ✅ Smart contract written in Rust for Soroban
+- ✅ Frontend React application with TypeScript
+- ✅ Freighter wallet integration
+- ✅ Generated contract bindings
+- ⚠️ **Requires contract deployment and configuration**
+
+**To get started, follow the [Setup Guide](frontend/SETUP.md) to deploy the smart contract and configure the frontend.**
+
 ## 🎯 Concept
 
 **EduChain Scholarships** - A microfinance tool on Stellar for crowdfunding education where:
@@ -24,21 +36,25 @@ A hackathon-ready MVP dApp on Stellar using Soroban smart contracts (Rust) and a
 ```
 Calcy/
 ├── contracts/
-│   └── educhain-scholarships/
+│   └── savings_pot/                    # Smart contract directory
 │       ├── src/
-│       │   ├── lib.rs          # Smart contract implementation
-│       │   └── test.rs         # Contract tests
-│       └── Cargo.toml          # Rust dependencies
+│       │   ├── lib.rs                  # Smart contract implementation
+│       │   └── test.rs                 # Contract tests
+│       ├── target/                     # Build artifacts
+│       └── Cargo.toml                  # Rust dependencies
 ├── frontend/
 │   ├── src/
-│   │   ├── components/         # React components
-│   │   ├── hooks/              # Custom React hooks
-│   │   ├── types/              # TypeScript type definitions
-│   │   ├── utils/              # Utility functions
-│   │   └── App.tsx             # Main application
-│   ├── package.json            # Frontend dependencies
-│   └── env.example             # Environment variables template
-└── README.md                   # This file
+│   │   ├── components/                 # React components
+│   │   ├── hooks/                      # Custom React hooks
+│   │   ├── types/                      # TypeScript type definitions
+│   │   ├── utils/                      # Utility functions
+│   │   ├── config/                     # Contract configuration
+│   │   ├── contracts/                  # Generated contract bindings
+│   │   └── App.tsx                     # Main application
+│   ├── package.json                    # Frontend dependencies
+│   ├── SETUP.md                        # Complete setup guide
+│   └── env.example                     # Environment variables template
+└── README.md                           # This file
 ```
 
 ## 🚀 Quick Start
@@ -46,23 +62,23 @@ Calcy/
 ### Prerequisites
 
 1. **Install Rust** (https://rustup.rs/)
-2. **Install Stellar CLI** (https://soroban.stellar.org/docs/getting-started/setup)
+2. **Install Soroban CLI** (https://soroban.stellar.org/docs/getting-started/setup)
 3. **Install Node.js** (v18+)
 4. **Install Freighter Wallet** (https://www.freighter.app/)
 
 ### 1. Smart Contract Setup
 
 ```bash
-cd contracts/educhain-scholarships
+cd contracts/savings_pot
 
 # Build the contract
-stellar contract build
+soroban contract build
 
 # Run tests
 cargo test
 
-# Deploy to testnet (after building)
-stellar contract deploy --network testnet --source <YOUR_SECRET_KEY> target/wasm32-unknown-unknown/release/educhain-scholarships.wasm
+# Deploy to testnet (see SETUP.md for detailed steps)
+soroban contract deploy --network testnet --source <YOUR_SECRET_KEY> target/wasm32-unknown-unknown/release/educhain_scholarships.wasm
 ```
 
 ### 2. Frontend Setup
@@ -73,25 +89,26 @@ cd frontend
 # Install dependencies
 npm install
 
-# Copy environment template
-cp env.example .env.local
-
-# Edit .env.local with your contract ID
-# VITE_CONTRACT_ID=<YOUR_DEPLOYED_CONTRACT_ID>
+# Configure contracts (see SETUP.md for detailed steps)
+# Update frontend/src/config/contracts.ts with your contract IDs
 
 # Start development server
 npm run dev
 ```
 
-### 3. Environment Configuration
+### 3. Configuration
 
-Create `.env.local` in the frontend directory:
+**Important**: After deploying your smart contract, update the configuration in `frontend/src/config/contracts.ts`:
 
-```env
-VITE_NETWORK_PASSPHRASE=Test SDF Network ; September 2015
-VITE_RPC_URL=https://soroban-testnet.stellar.org
-VITE_CONTRACT_ID=<YOUR_CONTRACT_ID>
+```typescript
+export const CONTRACT_CONFIG = {
+  CONTRACT_ID: 'YOUR_DEPLOYED_CONTRACT_ID_HERE',
+  TOKEN_CONTRACT_ID: 'native', // Use 'native' for XLM on testnet
+  // ... other settings
+};
 ```
+
+**For complete setup instructions, see [SETUP.md](frontend/SETUP.md)**
 
 ## 🔧 Smart Contract Functions
 
@@ -150,7 +167,7 @@ pub struct StudentApplication {
 ### Smart Contract Tests
 
 ```bash
-cd contracts/educhain-scholarships
+cd contracts/savings_pot
 cargo test
 ```
 
@@ -198,11 +215,11 @@ npm test
 
 ## 🚧 Development Notes
 
-- The frontend currently uses mock data for demonstration
-- Real contract integration requires proper Soroban TypeScript bindings
-- Generate bindings with: `stellar contract bindings typescript`
-- Implement proper error handling for production use
-- Add IPFS integration for essay storage
+- **Contract bindings are generated** and ready to use
+- **Frontend is fully integrated** with the smart contract
+- **Real contract integration** requires deployment and configuration
+- **Error handling** is implemented for production use
+- **IPFS integration** can be added for essay storage
 
 ## 📚 Resources
 
@@ -227,3 +244,5 @@ MIT License - see LICENSE file for details
 ---
 
 **Empowering Education Through Blockchain! 🎓🚀**
+
+**Next Step**: Follow the [Setup Guide](frontend/SETUP.md) to deploy your smart contract and start using the application!

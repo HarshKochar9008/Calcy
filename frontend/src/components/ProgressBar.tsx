@@ -14,7 +14,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, goal }) => {
   return (
     <div className="progress-container">
       <div className="progress-header">
-        <span>Progress to Goal</span>
+        <span>Progress</span>
         <span className="progress-text">
           {currentXLM.toFixed(2)} / {goalXLM.toFixed(2)} XLM
         </span>

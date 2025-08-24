@@ -42,14 +42,14 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
           <div className="wallet-details">
             <div className="wallet-status connected">Connected</div>
             <div className="wallet-address">
-              Address: {formatAddress(wallet.publicKey)}
+              {formatAddress(wallet.publicKey)}
             </div>
             {wallet.network && (
               <div className="wallet-network">
-                Network: {wallet.network.network}
+                {wallet.network.network}
                 {wallet.network.networkUrl && (
                   <div className="network-url">
-                    URL: {wallet.network.networkUrl}
+                    {wallet.network.networkUrl}
                   </div>
                 )}
               </div>
@@ -57,14 +57,14 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
           </div>
           <div className="wallet-actions">
             <button 
-              className="add-token-button"
+              className="btn btn-secondary"
               onClick={handleAddToken}
               title="Add Soroban token to wallet"
             >
               Add Token
             </button>
             <button 
-              className="disconnect-button"
+              className="btn btn-secondary"
               onClick={onDisconnect}
             >
               Disconnect
@@ -73,7 +73,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
         </div>
       ) : (
         <button 
-          className="connect-button"
+          className="btn btn-primary"
           onClick={onConnect}
         >
           Connect Wallet

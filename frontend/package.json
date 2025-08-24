@@ -10,8 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@soroban-react/chains": "^9.1.13",
+    "@soroban-react/contracts": "^9.3.0",
+    "@soroban-react/core": "^9.3.0",
+    "@soroban-react/freighter": "^9.1.13",
+    "@soroban-react/utils": "^9.1.13",
     "@stellar/freighter-api": "^4.1.0",
     "@stellar/stellar-sdk": "^14.0.0",
+    "contracts": "file:src/contracts",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

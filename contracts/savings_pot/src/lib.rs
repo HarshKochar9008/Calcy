@@ -1,9 +1,9 @@
 #![no_std]
 use soroban_sdk::{
-    contract, contractimpl, contracttype, symbol_short, Address, Env, Symbol, Vec, Map, 
-    symbol, vec, map, IntoVal, Val, Symbol as SymbolTrait
+    contract, contractimpl, contracttype, contracterror, Address, Env, Symbol, Vec, Map, String,
+    vec, map, symbol_short,
 };
-use soroban_token_sdk::TokenClient;
+use soroban_sdk::token::TokenClient;
 
 #[contracttype]
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -45,10 +45,10 @@ pub struct Donor {
 #[contract]
 pub struct EduChainScholarships;
 
-const POOL_KEY: Symbol = symbol!("POOL");
-const APPLICATIONS_KEY: Symbol = symbol!("APPLICATIONS");
-const DONORS_KEY: Symbol = symbol!("DONORS");
-const POOL_COUNTER_KEY: Symbol = symbol!("POOL_COUNTER");
+const POOL_KEY: Symbol = symbol_short!("POOL");
+const APPLICATIONS_KEY: Symbol = symbol_short!("APPS");
+const DONORS_KEY: Symbol = symbol_short!("DONORS");
+const POOL_COUNTER_KEY: Symbol = symbol_short!("PCOUNT");
 
 #[contractimpl]
 impl EduChainScholarships {
@@ -94,8 +94,10 @@ impl EduChainScholarships {
         };
         
         env.storage().instance().set(&POOL_KEY, &pool);
-        env.storage().instance().set(&APPLICATIONS_KEY, &map![env]);
-        env.storage().instance().set(&DONORS_KEY, &map![env]);
+        let applications_map: Map<Address, StudentApplication> = Map::new(env);
+        env.storage().instance().set(&APPLICATIONS_KEY, &applications_map);
+        let donors_map: Map<Address, Donor> = Map::new(env);
+        env.storage().instance().set(&DONORS_KEY, &donors_map);
         
         Ok(pool_id)
     }
@@ -106,7 +108,7 @@ impl EduChainScholarships {
             return Err(Error::InvalidAmount);
         }
 
-        let pool = Self::get_pool(env);
+        let pool = Self::get_pool(env)?;
         
         if !pool.is_active {
             return Err(Error::PoolNotActive);
@@ -152,7 +154,7 @@ impl EduChainScholarships {
         financial_need_score: i128,
         essay_hash: String
     ) -> Result<(), Error> {
-        let pool = Self::get_pool(env);
+        let pool = Self::get_pool(env)?;
         
         if env.ledger().timestamp() > pool.application_deadline {
             return Err(Error::ApplicationDeadlinePassed);
@@ -162,7 +164,11 @@ impl EduChainScholarships {
             return Err(Error::InvalidApplicationData);
         }
 
-        let applications: Map<Address, StudentApplication> = env.storage().instance().get(&APPLICATIONS_KEY).unwrap_or(map![env]);
+        let applications: Map<Address, StudentApplication> = env
+            .storage()
+            .instance()
+            .get(&APPLICATIONS_KEY)
+            .unwrap_or(Map::new(env));
         
         // Check if student already applied
         if applications.get(student.clone()).is_some() {
@@ -191,7 +197,7 @@ impl EduChainScholarships {
 
     /// Approve scholarship applications (only pool creator)
     pub fn approve_scholarships(env: &Env, creator: Address) -> Result<(), Error> {
-        let pool = Self::get_pool(env);
+        let pool = Self::get_pool(env)?;
         
         if pool.creator != creator {
             return Err(Error::Unauthorized);
@@ -201,21 +207,16 @@ impl EduChainScholarships {
             return Err(Error::ApplicationsStillOpen);
         }
 
-        let applications: Map<Address, StudentApplication> = env.storage().instance().get(&APPLICATIONS_KEY).unwrap_or(map![env]);
-        let mut approved_applications = vec![env];
-        
-        // Collect all applications
-        for (student_addr, application) in applications.iter() {
+        let applications: Map<Address, StudentApplication> = env
+            .storage()
+            .instance()
+            .get(&APPLICATIONS_KEY)
+            .unwrap_or(Map::new(env));
+        let mut approved_applications: Vec<StudentApplication> = vec![env];
+        // Collect all applications (no sorting available on Vec in contracts)
+        for (_, application) in applications.iter() {
             approved_applications.push_back(application);
         }
-        
-        // Sort by merit score (GPA + financial need)
-        // This is a simplified scoring system
-        approved_applications.sort_by(|a, b| {
-            let score_a = a.gpa + a.financial_need_score;
-            let score_b = b.gpa + b.financial_need_score;
-            score_b.cmp(&score_a) // Higher score first
-        });
 
         // Calculate scholarship amounts
         let total_applications = approved_applications.len();
@@ -248,7 +249,7 @@ impl EduChainScholarships {
 
     /// Distribute scholarships to approved students
     pub fn distribute_scholarships(env: &Env, creator: Address) -> Result<(), Error> {
-        let pool = Self::get_pool(env);
+        let pool = Self::get_pool(env)?;
         
         if pool.creator != creator {
             return Err(Error::Unauthorized);
@@ -258,7 +259,11 @@ impl EduChainScholarships {
             return Err(Error::DistributionNotReady);
         }
 
-        let applications: Map<Address, StudentApplication> = env.storage().instance().get(&APPLICATIONS_KEY).unwrap_or(map![env]);
+        let applications: Map<Address, StudentApplication> = env
+            .storage()
+            .instance()
+            .get(&APPLICATIONS_KEY)
+            .unwrap_or(Map::new(env));
         let token_client = TokenClient::new(env, &pool.token);
         
         let mut total_distributed = 0;
@@ -281,19 +286,33 @@ impl EduChainScholarships {
     }
 
     /// Get current pool state
-    pub fn get_pool(env: &Env) -> ScholarshipPool {
-        env.storage().instance().get(&POOL_KEY).unwrap()
+    pub fn get_pool(env: &Env) -> Result<ScholarshipPool, Error> {
+        env.storage().instance().get(&POOL_KEY)
+            .ok_or(Error::PoolNotInitialized)
+    }
+
+    /// Get current pool state (returns Option for backward compatibility)
+    pub fn get_pool_opt(env: &Env) -> Option<ScholarshipPool> {
+        env.storage().instance().get(&POOL_KEY)
     }
 
     /// Get student application
     pub fn get_application(env: &Env, student: Address) -> Option<StudentApplication> {
-        let applications: Map<Address, StudentApplication> = env.storage().instance().get(&APPLICATIONS_KEY).unwrap_or(map![env]);
+        let applications: Map<Address, StudentApplication> = env
+            .storage()
+            .instance()
+            .get(&APPLICATIONS_KEY)
+            .unwrap_or(Map::new(env));
         applications.get(student)
     }
 
     /// Get all applications
     pub fn get_all_applications(env: &Env) -> Vec<StudentApplication> {
-        let applications: Map<Address, StudentApplication> = env.storage().instance().get(&APPLICATIONS_KEY).unwrap_or(map![env]);
+        let applications: Map<Address, StudentApplication> = env
+            .storage()
+            .instance()
+            .get(&APPLICATIONS_KEY)
+            .unwrap_or(Map::new(env));
         let mut app_vec = vec![env];
         for (_, application) in applications.iter() {
             app_vec.push_back(application);
@@ -303,18 +322,33 @@ impl EduChainScholarships {
 
     /// Get donor information
     pub fn get_donor(env: &Env, donor: Address) -> Option<Donor> {
-        let donors: Map<Address, Donor> = env.storage().instance().get(&DONORS_KEY).unwrap_or(map![env]);
+        let donors: Map<Address, Donor> = env
+            .storage()
+            .instance()
+            .get(&DONORS_KEY)
+            .unwrap_or(Map::new(env));
         donors.get(donor)
     }
 
     /// Get pool statistics
     pub fn get_pool_stats(env: &Env) -> (u32, u32, u32) {
-        let applications: Map<Address, StudentApplication> = env.storage().instance().get(&APPLICATIONS_KEY).unwrap_or(map![env]);
-        let donors: Map<Address, Donor> = env.storage().instance().get(&DONORS_KEY).unwrap_or(map![env]);
+        let applications: Map<Address, StudentApplication> = env
+            .storage()
+            .instance()
+            .get(&APPLICATIONS_KEY)
+            .unwrap_or(Map::new(env));
+        let donors: Map<Address, Donor> = env
+            .storage()
+            .instance()
+            .get(&DONORS_KEY)
+            .unwrap_or(Map::new(env));
         
-        let total_applications = applications.len();
-        let approved_applications = applications.iter().filter(|(_, app)| app.is_approved).count();
-        let total_donors = donors.len();
+        let total_applications: u32 = applications.len();
+        let approved_applications: u32 = (applications
+            .iter()
+            .filter(|(_, app)| app.is_approved)
+            .count()) as u32;
+        let total_donors: u32 = donors.len();
         
         (total_applications, approved_applications, total_donors)
     }
@@ -328,35 +362,20 @@ impl EduChainScholarships {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[contracterror]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Error {
-    InvalidAmount,
-    InvalidScholarshipRange,
-    InvalidDeadline,
-    PoolNotActive,
-    ApplicationDeadlinePassed,
-    InvalidApplicationData,
-    AlreadyApplied,
-    Unauthorized,
-    ApplicationsStillOpen,
-    DistributionNotReady,
-}
-
-impl soroban_sdk::IntoVal<Env, Val> for Error {
-    fn into_val(self, _env: &Env) -> Val {
-        match self {
-            Error::InvalidAmount => symbol_short!("InvalidAmount").into_val(_env),
-            Error::InvalidScholarshipRange => symbol_short!("InvalidScholarshipRange").into_val(_env),
-            Error::InvalidDeadline => symbol_short!("InvalidDeadline").into_val(_env),
-            Error::PoolNotActive => symbol_short!("PoolNotActive").into_val(_env),
-            Error::ApplicationDeadlinePassed => symbol_short!("ApplicationDeadlinePassed").into_val(_env),
-            Error::InvalidApplicationData => symbol_short!("InvalidApplicationData").into_val(_env),
-            Error::AlreadyApplied => symbol_short!("AlreadyApplied").into_val(_env),
-            Error::Unauthorized => symbol_short!("Unauthorized").into_val(_env),
-            Error::ApplicationsStillOpen => symbol_short!("ApplicationsStillOpen").into_val(_env),
-            Error::DistributionNotReady => symbol_short!("DistributionNotReady").into_val(_env),
-        }
-    }
+    InvalidAmount = 1,
+    InvalidScholarshipRange = 2,
+    InvalidDeadline = 3,
+    PoolNotActive = 4,
+    ApplicationDeadlinePassed = 5,
+    InvalidApplicationData = 6,
+    AlreadyApplied = 7,
+    Unauthorized = 8,
+    ApplicationsStillOpen = 9,
+    DistributionNotReady = 10,
+    PoolNotInitialized = 11,
 }
 
 #[cfg(test)]

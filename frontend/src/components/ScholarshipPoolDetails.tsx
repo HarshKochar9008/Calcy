@@ -32,16 +32,14 @@ export const ScholarshipPoolDetails: React.FC<ScholarshipPoolDetailsProps> = ({ 
 
   return (
     <div className="scholarship-pool-details">
-      <h2>Scholarship Pool Details</h2>
-      
       <div className="pool-stats">
         <div className="stat-item">
-          <label>Funding Goal:</label>
+          <label>Goal:</label>
           <span className="value">{goalXLM.toFixed(2)} XLM</span>
         </div>
         
         <div className="stat-item">
-          <label>Current Balance:</label>
+          <label>Balance:</label>
           <span className="value">{balanceXLM.toFixed(2)} XLM</span>
         </div>
         
@@ -59,34 +57,34 @@ export const ScholarshipPoolDetails: React.FC<ScholarshipPoolDetailsProps> = ({ 
       </div>
 
       <div className="scholarship-details">
-        <h3>Scholarship Information</h3>
+        <h3>Scholarship Range</h3>
         <div className="scholarship-range">
           <div className="range-item">
-            <label>Maximum Scholarship:</label>
+            <label>Maximum:</label>
             <span>{maxScholarshipXLM.toFixed(2)} XLM</span>
           </div>
           <div className="range-item">
-            <label>Minimum Scholarship:</label>
+            <label>Minimum:</label>
             <span>{minScholarshipXLM.toFixed(2)} XLM</span>
           </div>
         </div>
       </div>
 
       <div className="deadlines">
-        <h3>Important Dates</h3>
+        <h3>Deadlines</h3>
         <div className="deadline-item">
-          <label>Application Deadline:</label>
+          <label>Applications:</label>
           <span>{formatDeadline(pool.application_deadline)}</span>
         </div>
         <div className="deadline-item">
-          <label>Distribution Date:</label>
+          <label>Distribution:</label>
           <span>{formatDeadline(pool.distribution_deadline)}</span>
         </div>
       </div>
       
       {pool.is_active && (
         <div className="active-notice">
-          🎯 Pool is active! Students can apply and donors can contribute.
+          Pool is active
         </div>
       )}
     </div>

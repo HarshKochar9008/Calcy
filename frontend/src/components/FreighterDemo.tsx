@@ -92,10 +92,10 @@ export const FreighterDemo: React.FC<FreighterDemoProps> = ({ wallet }) => {
 
   return (
     <div className="freighter-demo">
-      <h3>Freighter API Demo</h3>
+      <h3>Freighter Demo</h3>
       
       <div className="demo-section">
-        <h4>Wallet Information</h4>
+        <h4>Wallet Info</h4>
         <div className="info-grid">
           <div className="info-item">
             <label>Address:</label>
@@ -110,8 +110,8 @@ export const FreighterDemo: React.FC<FreighterDemoProps> = ({ wallet }) => {
             <span className="monospace">{wallet.network?.networkUrl || 'N/A'}</span>
           </div>
           <div className="info-item">
-            <label>Connected to Testnet:</label>
-            <span>{isConnectedToNetwork(wallet, 'TESTNET') ? '✅ Yes' : '❌ No'}</span>
+            <label>Testnet:</label>
+            <span>{isConnectedToNetwork(wallet, 'TESTNET') ? 'Yes' : 'No'}</span>
           </div>
         </div>
       </div>
@@ -143,13 +143,13 @@ export const FreighterDemo: React.FC<FreighterDemoProps> = ({ wallet }) => {
       </div>
 
       <div className="demo-section">
-        <h4>Add Soroban Token</h4>
+        <h4>Add Token</h4>
         <div className="input-group">
           <input
             type="text"
             value={contractId}
             onChange={(e) => setContractId(e.target.value)}
-            placeholder="Enter Soroban contract ID (starts with C...)"
+            placeholder="Enter Soroban contract ID"
             className="demo-input"
           />
           <button
@@ -166,7 +166,7 @@ export const FreighterDemo: React.FC<FreighterDemoProps> = ({ wallet }) => {
       </div>
 
       <div className="demo-section">
-        <h4>Network Information</h4>
+        <h4>Network Info</h4>
         <button
           onClick={handleGetNetwork}
           disabled={isLoading}
@@ -177,20 +177,20 @@ export const FreighterDemo: React.FC<FreighterDemoProps> = ({ wallet }) => {
       </div>
 
       {error && (
-        <div className="error-message">
-          <strong>Error:</strong> {error}
+        <div className="error-box">
+          {error}
         </div>
       )}
 
       {success && (
-        <div className="success-message">
-          <strong>Success:</strong> {success}
+        <div className="result-box">
+          {success}
         </div>
       )}
 
       <div className="demo-actions">
         <button onClick={clearMessages} className="clear-button">
-          Clear Messages
+          Clear
         </button>
       </div>
     </div>

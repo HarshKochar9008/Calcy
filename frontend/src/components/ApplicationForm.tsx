@@ -47,11 +47,11 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
   return (
     <div className="application-form">
-      <h3>📚 Apply for Scholarship</h3>
+      <h3>Apply for Scholarship</h3>
       
       <div className="application-status">
         <span className={`status ${isApplicationOpen ? 'open' : 'closed'}`}>
-          {isApplicationOpen ? 'Applications Open' : 'Applications Closed'}
+          {isApplicationOpen ? 'Open' : 'Closed'}
         </span>
         <span className="deadline">
           Deadline: {new Date(pool.application_deadline * 1000).toLocaleDateString()}
@@ -61,7 +61,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
       {isApplicationOpen ? (
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="student-name">Full Name:</label>
+            <label htmlFor="student-name">Name:</label>
             <input
               id="student-name"
               type="text"
@@ -69,7 +69,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
               onChange={(e) => handleInputChange('name', e.target.value)}
               disabled={isLoading}
               required
-              placeholder="Enter your full name"
+              placeholder="Full name"
             />
           </div>
 
@@ -105,7 +105,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="gpa">GPA (0.0 - 4.0):</label>
+              <label htmlFor="gpa">GPA:</label>
               <input
                 id="gpa"
                 type="number"
@@ -120,7 +120,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="financial-need">Financial Need Score (1-100):</label>
+              <label htmlFor="financial-need">Financial Need (1-100):</label>
               <input
                 id="financial-need"
                 type="number"
@@ -146,7 +146,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
               placeholder="ipfs://QmExampleEssayHash..."
             />
             <small className="help-text">
-              Upload your essay to IPFS and paste the hash here
+              Upload essay to IPFS and paste hash
             </small>
           </div>
 
@@ -155,13 +155,12 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
             className="apply-button"
             disabled={isLoading || !formData.name.trim()}
           >
-            {isLoading ? 'Submitting...' : 'Submit Application'}
+            {isLoading ? 'Submitting...' : 'Submit'}
           </button>
         </form>
       ) : (
         <div className="applications-closed">
-          <p>Applications for this scholarship pool are now closed.</p>
-          <p>Check back for future opportunities!</p>
+          <p>Applications are closed.</p>
         </div>
       )}
     </div>
