@@ -5,15 +5,16 @@
 export const CONTRACT_CONFIG = {
   // Network Configuration - TESTNET ONLY
   NETWORK_PASSPHRASE: 'Test SDF Network ; September 2015', // This is the TESTNET passphrase
-  RPC_URL: 'https://rpc.ankr.com/stellar_testnet_soroban/27d8079fb434ba5169358c0a6b24951c5ba0f32690f57218399fc1b6a47e07a7',
+  RPC_URL: 'https://soroban-testnet.stellar.org', // Soroban RPC endpoint for testnet
   
-  // Alternative RPC URLs if the main one doesn't work
-  ALTERNATIVE_RPC_URLS: [
-    'https://rpc.ankr.com/stellar_testnet_soroban/27d8079fb434ba5169358c0a6b24951c5ba0f32690f57218399fc1b6a47e07a7',
-    'https://soroban-testnet.stellar.org',
-    'https://testnet.stellar.org',
-    'https://horizon-testnet.stellar.org'
-  ],
+  // Network Validation Settings
+  NETWORK_VALIDATION: {
+    STRICT_TESTNET_ONLY: true, // Set to false to allow other networks (not recommended for production)
+    ALLOWED_NETWORKS: ['testnet', 'TESTNET', 'Testnet', 'test', 'TEST'], // Networks that are considered testnet
+    BYPASS_VALIDATION: false, // Set to true to completely bypass network validation (use with caution)
+  },
+  
+
   
   // Contract Addresses (update these after deployment)
   CONTRACT_ID: 'CADCLWIMKSZ44WPAVI6HMM67WVEI3P24VUAOTV47KDL364ZMOM5QAFKK', // Deployed EduChain Scholarships contract ID (TESTNET)
@@ -41,10 +42,73 @@ export const getConfigurationStatus = () => {
   };
 };
 
+// Helper function to test Soroban RPC endpoint specifically
+export const testSorobanRpcEndpoint = async (): Promise<{ isWorking: boolean; error?: string }> => {
+  const sorobanUrl = 'https://soroban-testnet.stellar.org';
+  
+  try {
+    console.log('🔍 Testing Soroban RPC endpoint specifically...');
+    
+    const response = await fetch(sorobanUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      signal: AbortSignal.timeout(10000) // 10 second timeout for Soroban RPC
+    });
+    
+    if (response.ok) {
+      console.log('✅ Soroban RPC endpoint is working and correctly configured for testnet');
+      return { isWorking: true };
+    } else {
+      console.warn(`⚠️ Soroban RPC endpoint responded with status: ${response.status}`);
+      return { isWorking: false, error: `HTTP ${response.status}` };
+    }
+  } catch (error: any) {
+    console.error('❌ Soroban RPC endpoint test failed:', error);
+    return { 
+      isWorking: false, 
+      error: error.message || 'Connection failed' 
+    };
+  }
+};
+
 // Helper function to get working RPC URL
 export const getWorkingRpcUrl = async (): Promise<string> => {
-  // For Soroban, the Ankr endpoint should be the primary choice
-  // The health check approach doesn't work with Soroban RPC endpoints
-  console.log('Using Ankr Soroban testnet RPC URL');
-  return 'https://rpc.ankr.com/stellar_testnet_soroban/27d8079fb434ba5169358c0a6b24951c5ba0f32690f57218399fc1b6a47e07a7';
+  // Prioritize the Soroban RPC endpoint as it's the standard for smart contracts
+  console.log('🔍 Testing Soroban RPC endpoints for connectivity...');
+  
+  const testUrls = [
+    'https://soroban-testnet.stellar.org',
+    'https://soroban-testnet.stellar.org:443',
+    'https://testnet.stellar.org'
+  ];
+  
+  for (const url of testUrls) {
+    try {
+      console.log(`Testing Soroban RPC endpoint: ${url}`);
+      
+      // Test the endpoint with a simple health check
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        // Add a reasonable timeout
+        signal: AbortSignal.timeout(5000)
+      });
+      
+      if (response.ok) {
+        console.log(`✅ Soroban RPC endpoint working: ${url}`);
+        return url;
+      }
+    } catch (error) {
+      console.warn(`❌ Soroban RPC endpoint failed: ${url}`, error);
+      continue;
+    }
+  }
+  
+  // If all fail, fall back to the primary Soroban RPC endpoint
+  console.log('⚠️ All Soroban RPC endpoints failed, using primary Soroban RPC endpoint');
+  return 'https://soroban-testnet.stellar.org';
 };

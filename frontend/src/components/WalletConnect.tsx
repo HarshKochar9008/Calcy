@@ -5,14 +5,14 @@ interface WalletConnectProps {
   wallet: Wallet | null;
   isConnected: boolean;
   onConnect: () => void;
-  onDisconnect: () => void;
+  DisconnectWallet: () => void;
 }
 
 export const WalletConnect: React.FC<WalletConnectProps> = ({
   wallet,
   isConnected,
   onConnect,
-  onDisconnect,
+  DisconnectWallet,
 }) => {
   const handleAddToken = async () => {
     if (!wallet) return;
@@ -44,16 +44,6 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
             <div className="wallet-address">
               {formatAddress(wallet.publicKey)}
             </div>
-            {wallet.network && (
-              <div className="wallet-network">
-                {wallet.network.network}
-                {wallet.network.networkUrl && (
-                  <div className="network-url">
-                    {wallet.network.networkUrl}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
           <div className="wallet-actions">
             <button 
@@ -65,7 +55,7 @@ export const WalletConnect: React.FC<WalletConnectProps> = ({
             </button>
             <button 
               className="btn btn-secondary"
-              onClick={onDisconnect}
+              onClick={DisconnectWallet}
             >
               Disconnect
             </button>

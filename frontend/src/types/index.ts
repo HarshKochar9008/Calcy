@@ -33,7 +33,7 @@ export interface NetworkInfo {
   network: string;
   networkPassphrase: string;
   networkUrl?: string;
-  sorobanRpcUrl?: string;
+  horizonRpcUrl?: string;
 }
 
 export interface Wallet {
@@ -42,7 +42,7 @@ export interface Wallet {
   network: NetworkInfo | null;
   signTransaction: (xdr: string, opts?: { network?: string; networkPassphrase?: string; address?: string }) => Promise<{ signedTxXdr: string; signerAddress: string }>;
   signAuthEntry: (authEntryXdr: string, opts: { address: string }) => Promise<{ signedAuthEntry: Uint8Array | null; signerAddress: string }>;
-  signMessage: (message: string, opts: { address: string }) => Promise<{ signedMessage: string | null; signerAddress: string }>;
+  signMessage: (message: string, opts: { address: string }) => Promise<{ signedMessage: string | Uint8Array | null; signerAddress: string }>;
   addToken: (params: { contractId: string; networkPassphrase?: string }) => Promise<{ contractId: string }>;
   getNetwork: () => Promise<NetworkInfo>;
   getNetworkDetails: () => Promise<NetworkInfo>;

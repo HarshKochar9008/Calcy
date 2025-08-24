@@ -57,12 +57,12 @@ export const signMessageWithFreighter = async (
 };
 
 /**
- * Adds a Soroban token to the user's Freighter wallet
+ * Adds a Horizon token to the user's Freighter wallet
  * @param wallet - The connected wallet instance
- * @param contractId - The Soroban token contract ID
+ * @param contractId - The Horizon token contract ID
  * @returns The contract ID of the added token
  */
-export const addSorobanToken = async (
+export const addHorizonToken = async (
   wallet: Wallet,
   contractId: string
 ): Promise<string> => {
@@ -130,12 +130,12 @@ export const isValidStellarAddress = (address: string): boolean => {
 };
 
 /**
- * Validates a Soroban contract ID format
+ * Validates a Horizon contract ID format
  * @param contractId - The contract ID to validate
  * @returns True if the contract ID format is valid
  */
-export const isValidSorobanContractId = (contractId: string): boolean => {
-  // Basic Soroban contract ID validation (starts with C and is 56 characters)
-  const sorobanContractRegex = /^C[A-Z2-7]{55}$/;
-  return sorobanContractRegex.test(contractId);
+export const isValidHorizonContractId = (contractId: string): boolean => {
+  // Basic Horizon contract ID validation (starts with C and is 56 characters)
+  const horizonContractRegex = /^C[A-Z2-7]{55}$/;
+  return horizonContractRegex.test(contractId);
 };
