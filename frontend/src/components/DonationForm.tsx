@@ -30,14 +30,14 @@ export const DonationForm: React.FC<DonationFormProps> = ({
 
   return (
     <div className="donation-form">
-      <h3>💝 Donate to Scholarship Pool</h3>
+      <h3>Donate</h3>
       
       <div className="donation-info">
         <div className="info-item">
-          <span>Your Total Donations: {userDonationXLM.toFixed(2)} XLM</span>
+          Your donations: {userDonationXLM.toFixed(2)} XLM
         </div>
         <div className="info-item">
-          <span>Remaining Goal: {remainingGoal.toFixed(2)} XLM</span>
+          Remaining goal: {remainingGoal.toFixed(2)} XLM
         </div>
       </div>
       
@@ -77,12 +77,12 @@ export const DonationForm: React.FC<DonationFormProps> = ({
           className="donate-button"
           disabled={isLoading || amount <= 0 || amount > remainingGoal || !pool.is_active}
         >
-          {isLoading ? 'Processing...' : 'Donate Now'}
+          {isLoading ? 'Processing...' : 'Donate'}
         </button>
         
         {!pool.is_active && (
           <p className="pool-closed-notice">
-            This scholarship pool is currently closed for donations.
+            Pool is closed for donations.
           </p>
         )}
       </form>

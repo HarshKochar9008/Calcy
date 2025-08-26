@@ -1,7 +1,10 @@
+import { CONTRACT_CONFIG } from '../config/contracts';
+
 // Stellar Network Configuration
-export const NETWORK_PASSPHRASE = import.meta.env.VITE_NETWORK_PASSPHRASE || 'Test SDF Network ; September 2015';
-export const RPC_URL = import.meta.env.VITE_RPC_URL || 'https://soroban-testnet.stellar.org';
-export const CONTRACT_ID = import.meta.env.VITE_CONTRACT_ID || '';
+export const NETWORK_PASSPHRASE = CONTRACT_CONFIG.NETWORK_PASSPHRASE;
+export const RPC_URL = CONTRACT_CONFIG.RPC_URL;
+export const CONTRACT_ID = CONTRACT_CONFIG.CONTRACT_ID;
+export const TOKEN_CONTRACT_ID = CONTRACT_CONFIG.TOKEN_CONTRACT_ID;
 
 // XLM Asset (native token)
 export const XLM_ASSET = {
@@ -11,9 +14,9 @@ export const XLM_ASSET = {
 };
 
 // Default scholarship pool settings (in stroops - 1 XLM = 10,000,000 stroops)
-export const DEFAULT_TOTAL_GOAL_STROOPS = 500_000_000; // 50 XLM
-export const DEFAULT_MAX_SCHOLARSHIP_STROOPS = 50_000_000; // 5 XLM
-export const DEFAULT_MIN_SCHOLARSHIP_STROOPS = 10_000_000; // 1 XLM
+export const DEFAULT_TOTAL_GOAL_STROOPS = CONTRACT_CONFIG.DEFAULT_TOTAL_GOAL_STROOPS;
+export const DEFAULT_MAX_SCHOLARSHIP_STROOPS = CONTRACT_CONFIG.DEFAULT_MAX_SCHOLARSHIP_STROOPS;
+export const DEFAULT_MIN_SCHOLARSHIP_STROOPS = CONTRACT_CONFIG.DEFAULT_MIN_SCHOLARSHIP_STROOPS;
 export const DEFAULT_DONATION_STROOPS = 10_000_000; // 1 XLM
 
 // Academic levels

@@ -30,28 +30,30 @@ export const ScholarshipPoolDetails: React.FC<ScholarshipPoolDetailsProps> = ({ 
     return 'Active';
   };
 
+  const isPoolActive = pool.is_active && Date.now() / 1000 <= pool.application_deadline;
+
   return (
     <div className="scholarship-pool-details">
-      <h2>Scholarship Pool Details</h2>
+      <h3>Scholarship Pool Details</h3>
       
       <div className="pool-stats">
         <div className="stat-item">
-          <label>Funding Goal:</label>
+          <label>Funding Goal</label>
           <span className="value">{goalXLM.toFixed(2)} XLM</span>
         </div>
         
         <div className="stat-item">
-          <label>Current Balance:</label>
+          <label>Current Balance</label>
           <span className="value">{balanceXLM.toFixed(2)} XLM</span>
         </div>
         
         <div className="stat-item">
-          <label>Progress:</label>
+          <label>Progress</label>
           <span className="value">{percentage.toFixed(1)}%</span>
         </div>
         
         <div className="stat-item">
-          <label>Status:</label>
+          <label>Status</label>
           <span className={`status ${getStatusColor()}`}>
             {getStatusText()}
           </span>
@@ -59,7 +61,7 @@ export const ScholarshipPoolDetails: React.FC<ScholarshipPoolDetailsProps> = ({ 
       </div>
 
       <div className="scholarship-details">
-        <h3>Scholarship Information</h3>
+        <h3>Scholarship Range</h3>
         <div className="scholarship-range">
           <div className="range-item">
             <label>Maximum Scholarship:</label>
@@ -73,20 +75,20 @@ export const ScholarshipPoolDetails: React.FC<ScholarshipPoolDetailsProps> = ({ 
       </div>
 
       <div className="deadlines">
-        <h3>Important Dates</h3>
+        <h3>Important Deadlines</h3>
         <div className="deadline-item">
-          <label>Application Deadline:</label>
+          <label>Applications Close:</label>
           <span>{formatDeadline(pool.application_deadline)}</span>
         </div>
         <div className="deadline-item">
-          <label>Distribution Date:</label>
+          <label>Distribution Begins:</label>
           <span>{formatDeadline(pool.distribution_deadline)}</span>
         </div>
       </div>
       
-      {pool.is_active && (
+      {isPoolActive && (
         <div className="active-notice">
-          🎯 Pool is active! Students can apply and donors can contribute.
+          🎉 Pool is Active - Accepting Donations & Applications! 🎉
         </div>
       )}
     </div>

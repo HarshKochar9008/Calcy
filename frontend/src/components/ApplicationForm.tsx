@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { ScholarshipPool } from '../types';
 import { ACADEMIC_LEVELS, FIELDS_OF_STUDY } from '../utils/constants';
 
@@ -21,13 +21,19 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
   pool,
 }) => {
   const [formData, setFormData] = useState({
-    name: '',
+    name: 'John Doe', // Set a default name for testing
     academic_level: 'Undergraduate',
     field_of_study: 'Computer Science',
     gpa: 3.5,
     financial_need_score: 50,
     essay_hash: 'ipfs://QmExampleEssayHash123...', // Mock IPFS hash
   });
+
+  // Debug logging
+  useEffect(() => {
+    console.log('ApplicationForm - Current form data:', formData);
+    console.log('ApplicationForm - Name field value:', formData.name);
+  }, [formData]);
 
   const isApplicationOpen = Date.now() / 1000 < pool.application_deadline;
 
@@ -39,6 +45,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
   };
 
   const handleInputChange = (field: string, value: string | number) => {
+    console.log(`Updating ${field} to:`, value);
     setFormData(prev => ({
       ...prev,
       [field]: value
@@ -47,11 +54,11 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
   return (
     <div className="application-form">
-      <h3>📚 Apply for Scholarship</h3>
+      <h3>Apply for Scholarship</h3>
       
       <div className="application-status">
         <span className={`status ${isApplicationOpen ? 'open' : 'closed'}`}>
-          {isApplicationOpen ? 'Applications Open' : 'Applications Closed'}
+          {isApplicationOpen ? 'Open' : 'Closed'}
         </span>
         <span className="deadline">
           Deadline: {new Date(pool.application_deadline * 1000).toLocaleDateString()}
@@ -61,7 +68,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
       {isApplicationOpen ? (
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="student-name">Full Name:</label>
+            <label htmlFor="student-name">Name:</label>
             <input
               id="student-name"
               type="text"
@@ -70,7 +77,11 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
               disabled={isLoading}
               required
               placeholder="Enter your full name"
+              style={{ color: '#1e293b', backgroundColor: '#ffffff' }}
             />
+            <small style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+              Current value: {formData.name || 'No name entered'}
+            </small>
           </div>
 
           <div className="form-group">
@@ -105,7 +116,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="gpa">GPA (0.0 - 4.0):</label>
+              <label htmlFor="gpa">GPA:</label>
               <input
                 id="gpa"
                 type="number"
@@ -120,7 +131,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="financial-need">Financial Need Score (1-100):</label>
+              <label htmlFor="financial-need">Financial Need (1-100):</label>
               <input
                 id="financial-need"
                 type="number"
@@ -146,7 +157,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
               placeholder="ipfs://QmExampleEssayHash..."
             />
             <small className="help-text">
-              Upload your essay to IPFS and paste the hash here
+              Upload essay to IPFS and paste hash
             </small>
           </div>
 
@@ -160,8 +171,7 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
         </form>
       ) : (
         <div className="applications-closed">
-          <p>Applications for this scholarship pool are now closed.</p>
-          <p>Check back for future opportunities!</p>
+          <p>Applications are closed.</p>
         </div>
       )}
     </div>
