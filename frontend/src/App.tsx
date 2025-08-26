@@ -443,7 +443,7 @@ function App() {
                   {pool ? (
                     <>
                       <ScholarshipPoolDetails pool={pool} />
-                      <ProgressBar current={pool.current_balance} goal={pool.total_goal} />
+                      <ProgressBar current={pool.current_balance} goal={pool.total_goal} pool={pool} />
                     </>
                   ) : (
                     <div className="info">

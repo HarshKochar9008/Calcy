@@ -104,23 +104,26 @@ export const useContract = (wallet: Wallet | null) => {
     try {
       setIsLoading(true);
       setError(null);
-      console.log('💰 Processing donation:', amount, 'stroops');
+      
+      // Convert XLM to stroops (1 XLM = 10,000,000 stroops)
+      const amountInStroops = Math.floor(amount * 10_000_000);
+      console.log('💰 Processing donation:', amount, 'XLM =', amountInStroops, 'stroops');
 
       // Simulate contract call delay
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // Update pool balance
-      const updatedPool = { ...pool, current_balance: pool.current_balance + amount };
+      // Update pool balance (in stroops)
+      const updatedPool = { ...pool, current_balance: pool.current_balance + amountInStroops };
       setPool(updatedPool);
 
-      // Update user donation
-      setUserDonation(prev => prev + amount);
+      // Update user donation (in stroops)
+      setUserDonation(prev => prev + amountInStroops);
 
       // Update stats
       setPoolStats(prev => ({ ...prev, total_donors: prev.total_donors + 1 }));
 
-      setSuccess(`Successfully donated ${amount} stroops! Thank you for supporting education.`);
-      console.log('✅ Donation processed successfully');
+      setSuccess(`Successfully donated ${amount} XLM! Thank you for supporting education.`);
+      console.log('✅ Donation processed successfully. Pool balance updated from', pool.current_balance, 'to', updatedPool.current_balance, 'stroops');
 
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to process donation';
