@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { STROOPS_TO_XLM } from '../utils/constants';
 
 interface ProgressBarProps {
@@ -24,6 +24,33 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, goal, pool })
   const isDistributionOpen = pool ? now >= pool.distribution_deadline : false;
   const isPoolActive = pool?.is_active ?? false;
 
+  // Debug logging
+  useEffect(() => {
+    console.log('🔍 ProgressBar Debug:', {
+      currentStroops: current,
+      goalStroops: goal,
+      currentXLM: currentXLM,
+      goalXLM: goalXLM,
+      percentage: percentage,
+      remainingGoalXLM: remainingGoal,
+      hasPool: !!pool,
+      poolActive: isPoolActive,
+      applicationOpen: isApplicationOpen,
+      distributionOpen: isDistributionOpen,
+      timestamp: new Date().toISOString()
+    });
+  }, [current, goal, currentXLM, goalXLM, percentage, remainingGoal, pool, isPoolActive, isApplicationOpen, isDistributionOpen]);
+
+  // Test function to simulate a donation
+  const testDonation = () => {
+    console.log('🧪 Testing donation simulation...');
+    console.log('Current pool balance (stroops):', current);
+    console.log('Current pool balance (XLM):', currentXLM);
+    console.log('Adding 1 XLM = 10,000,000 stroops');
+    console.log('New balance would be:', current + 10_000_000, 'stroops');
+    console.log('New balance would be:', (current + 10_000_000) / 10_000_000, 'XLM');
+  };
+
   return (
     <div className="progress-container">
       <div className="progress-header">
@@ -42,6 +69,24 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({ current, goal, pool })
       
       <div className="progress-percentage">
         {percentage.toFixed(1)}% Complete
+      </div>
+
+      {/* Test Button for Debugging */}
+      <div style={{ textAlign: 'center', marginTop: '1rem' }}>
+        <button 
+          onClick={testDonation}
+          style={{
+            padding: '0.5rem 1rem',
+            background: '#3b82f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '0.875rem'
+          }}
+        >
+          🧪 Test Donation Logic
+        </button>
       </div>
 
       {/* Enhanced Progress Details */}

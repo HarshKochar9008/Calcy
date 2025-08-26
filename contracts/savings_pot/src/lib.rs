@@ -412,6 +412,7 @@ impl EduChainScholarships {
         env.storage().instance().has(&DUMMY_DATA_INITIALIZED_KEY)
     }
 }
+}
 
 #[contracterror]
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]

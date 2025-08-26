@@ -3,7 +3,7 @@ import { ScholarshipPoolDetails } from './components/ScholarshipPoolDetails';
 import { DonationForm } from './components/DonationForm';
 import { ApplicationForm } from './components/ApplicationForm';
 import { ProgressBar } from './components/ProgressBar';
-
+import { WalletTokenDisplay } from './components/WalletTokenDisplay';
 import { useWallet } from './hooks/useWallet';
 import { useContract } from './hooks/useContract';
 import './App.css';
@@ -57,12 +57,14 @@ const scholarshipTypes = [
 function App() {
   // Get all wallet functions including connect and disconnect
   const { wallet, isConnected, connectionError, isFreighterDetected, connect, disconnect } = useWallet();
+  const [address, setAddress] = useState<string>('');
   const { 
     pool, 
     userDonation, 
     isLoading, 
     error,
     success,
+
     initializePool,
     donate,
     applyForScholarship,
@@ -95,10 +97,10 @@ function App() {
   };
 
   useEffect(() => {
-    if (isConnected && wallet) {
+    if (isConnected && wallet && address) {
       refreshPool();
     }
-  }, [isConnected, wallet, refreshPool]);
+  }, [isConnected, wallet, address, refreshPool]);
 
   return (
     <div className="app">
@@ -221,8 +223,6 @@ function App() {
         </div>
       </section>
 
-
-
       {/* Simple Connection Status */}
       {isFreighterDetected && !isConnected && (
         <div className="connection-prompt-banner">
@@ -245,32 +245,41 @@ function App() {
         <section id="scholarships">
           {!isConnected ? (
             <div className="connect-section">
-              <h1>🚀 EduChain Scholarships</h1>
-              <p>Connect your Freighter wallet to create and manage scholarship pools on Stellar testnet.</p>
+              <h1>🎮 MVP Demo Mode</h1>
+              <p>Welcome to EduChain Scholarships! This application is running in MVP Demo Mode.</p>
               
-              <div className="connect-notice" style={{ 
+              {/* Demo Mode Notice */}
+              <div className="demo-notice" style={{ 
                 marginBottom: '1rem', 
                 padding: '1rem', 
-                background: '#f0f9ff', 
+                background: '#e3f2fd', 
                 borderRadius: '8px', 
-                border: '1px solid #0ea5e9',
+                border: '1px solid #2196f3',
                 textAlign: 'center'
               }}>
-                <h3 style={{ marginBottom: '0.5rem', color: '#0369a1' }}>📱 How to Connect</h3>
-                <p style={{ fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.5rem' }}>
-                  <strong>1. Install Freighter Extension</strong>
+                <h3 style={{ marginBottom: '0.5rem', color: '#1976d2' }}>🚀 How to Use MVP Features</h3>
+                <p style={{ fontSize: '0.875rem', color: '#1976d2', marginBottom: '0.5rem' }}>
+                  <strong>Wallet Connection Temporarily Disabled</strong>
                 </p>
-                <p style={{ fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.5rem' }}>
-                  <strong>2. Switch to Testnet</strong>
+                <p style={{ fontSize: '0.875rem', color: '#1976d2', marginBottom: '0.5rem' }}>
+                  To test the application features, you can:
                 </p>
-                <p style={{ fontSize: '0.875rem', color: '#0369a1', marginBottom: '0.5rem' }}>
-                  <strong>3. Connect Wallet</strong>
-                </p>
-                <p style={{ fontSize: '0.875rem', color: '#0369a1', marginTop: '0.5rem' }}>
-                  <strong>Ready to create scholarship pools on testnet!</strong>
+                <ul style={{ 
+                  textAlign: 'left', 
+                  fontSize: '0.875rem', 
+                  color: '#1976d2',
+                  margin: '0 auto',
+                  maxWidth: '400px'
+                }}>
+                  <li>✅ View the application interface and components</li>
+                  <li>✅ See the scholarship pool structure</li>
+                  <li>✅ Understand the donation and application flows</li>
+                  <li>✅ Review the smart contract integration points</li>
+                </ul>
+                <p style={{ fontSize: '0.875rem', color: '#1976d2', marginTop: '0.5rem' }}>
+                  <strong>To enable full functionality:</strong> Deploy smart contracts and update configuration
                 </p>
               </div>
-
             </div>
           ) : (
             <div className="content">
@@ -336,8 +345,6 @@ function App() {
                   </button>
                 </div>
               </div>
-              
-
 
               <div className="grid">
                 <div className="panel">
@@ -388,24 +395,14 @@ function App() {
                     </div>
                   ) : (
                     <div className="create-pool">
-                      <h3>🚀 Create Your Scholarship Pool</h3>
-                      <p>Start a new scholarship pool to help students achieve their educational dreams. Set funding goals, deadlines, and scholarship amounts.</p>
+                      <p>Create a new scholarship pool to help students achieve their educational dreams</p>
                       <button 
                         className="btn btn-primary"
                         onClick={initializePool}
                         disabled={isLoading}
                       >
-                        {isLoading ? '🏗️ Creating Pool...' : '🎓 Create Scholarship Pool'}
+                        {isLoading ? 'Creating...' : 'Create Pool'}
                       </button>
-                      <div className="info-box">
-                        <h4>What happens next?</h4>
-                        <ul>
-                          <li>Pool is created on the blockchain</li>
-                          <li>Accept donations from supporters</li>
-                          <li>Students can apply for scholarships</li>
-                          <li>Distribute funds to approved students</li>
-                        </ul>
-                      </div>
                     </div>
                   )}
 
@@ -418,21 +415,6 @@ function App() {
                   {success && (
                     <div className="success-box">
                       <strong>Success:</strong> {success}
-                      {success.includes('Pool created successfully') && (
-                        <div style={{ marginTop: '1rem' }}>
-                          <p style={{ fontSize: '0.875rem', color: '#059669', marginBottom: '0.5rem' }}>
-                            Your scholarship pool has been created on the blockchain! 
-                            The pool details should appear below. If you don't see them, try refreshing.
-                          </p>
-                          <button 
-                            className="btn btn-secondary"
-                            onClick={refreshPool}
-                            style={{ fontSize: '0.875rem', padding: '0.5rem 1rem' }}
-                          >
-                            🔄 Refresh Pool Data
-                          </button>
-                        </div>
-                      )}
                     </div>
                   )}
                 </div>
@@ -476,7 +458,7 @@ function App() {
         <section id="contact" className="contact-section">
           <div className="contact-container">
             <h2>Contact Us</h2>
-            <p>Have questions about EduChain? Get in touch with me.</p>
+            <p>Have questions about EduChain? Get in touch with our team.</p>
             <div className="contact-info">
               <div className="contact-item">
                 <span className="contact-label">Email:</span>
@@ -491,19 +473,20 @@ function App() {
                 </span>
               </div>
               <div className="simple-status">
-                <h3>Wallet Status</h3>
+                <h3>Connection Status</h3>
                 <div className="status-content">
                   <span className="status-text">
-                    <strong>Status:</strong> {isConnected ? '✅ Connected to Testnet' : '❌ Not Connected'}
+                    <strong>Connected URL:</strong> {isConnected ? 'Wallet Connected' : 'No Wallet'}
                   </span>
-                  {wallet && (
-                    <span className="status-text">
-                      <strong>Address:</strong> {wallet.publicKey.substring(0, 8)}...{wallet.publicKey.substring(wallet.publicKey.length - 8)}
-                    </span>
-                  )}
+                  <button 
+                    className="reset-btn"
+                    onClick={() => window.location.reload()}
+                  >
+                    Reset
+                  </button>
                 </div>
               </div>
-
+              
               {/* Connection Error Display */}
               {connectionError && (
                 <div className="error-box">
@@ -514,10 +497,38 @@ function App() {
                       <li>Ensure Freighter extension is installed and unlocked</li>
                       <li>Switch to Testnet in Freighter</li>
                       <li>Refresh page after unlocking Freighter</li>
+                      <li>Check browser console for errors</li>
                     </ul>
                   </div>
                 </div>
               )}
+
+              {/* Wallet Status Information */}
+              <div className="status-info">
+                <p><strong>Status</strong></p>
+                <ul>
+                  <li>
+                    <strong>Freighter:</strong> 
+                    <span>{isFreighterDetected === null ? 'Checking...' : isFreighterDetected ? 'Detected' : 'Not Found'}</span>
+                  </li>
+                  <li>
+                    <strong>Connection:</strong> 
+                    <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
+                  </li>
+                  {wallet && (
+                    <li>
+                      <strong>Public Key:</strong> 
+                      <span>{wallet.publicKey.substring(0, 8)}...{wallet.publicKey.substring(wallet.publicKey.length - 8)}</span>
+                    </li>
+                  )}
+                  {address && (
+                    <li>
+                      <strong>Address:</strong> 
+                      <span>{address.substring(0, 8)}...{address.substring(address.length - 8)}</span>
+                    </li>
+                  )}
+                </ul>
+              </div>
             </div>
           </div>
         </section>
