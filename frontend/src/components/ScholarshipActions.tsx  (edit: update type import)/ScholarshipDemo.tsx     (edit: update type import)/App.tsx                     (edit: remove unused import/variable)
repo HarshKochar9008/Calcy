@@ -1,0 +1,29 @@
+import React, { useState } from 'react';
+
+const App = () => {
+  const [address] = useState<string>('');
+
+  return (
+    <div>
+      {/* Your component code here */}
+    </div>
+  );
+};
+
+export default App;
+
+import type { ScholarshipPool } from '../types';
+
+const ScholarshipActions = () => {
+  // Your component code here
+};
+
+export default ScholarshipActions;
+
+import type { ScholarshipPool } from '../types';
+
+const ScholarshipDemo = () => {
+  // Your component code here
+};
+
+export default ScholarshipDemo;

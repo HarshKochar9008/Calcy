@@ -3,7 +3,6 @@ import { ScholarshipPoolDetails } from './components/ScholarshipPoolDetails';
 import { DonationForm } from './components/DonationForm';
 import { ApplicationForm } from './components/ApplicationForm';
 import { ProgressBar } from './components/ProgressBar';
-import { WalletTokenDisplay } from './components/WalletTokenDisplay';
 import { useWallet } from './hooks/useWallet';
 import { useContract } from './hooks/useContract';
 import './App.css';
@@ -57,7 +56,6 @@ const scholarshipTypes = [
 function App() {
   // Get all wallet functions including connect and disconnect
   const { wallet, isConnected, connectionError, isFreighterDetected, connect, disconnect } = useWallet();
-  const [address, setAddress] = useState<string>('');
   const { 
     pool, 
     userDonation, 
@@ -69,8 +67,7 @@ function App() {
     donate,
     applyForScholarship,
     approveScholarships,
-    distributeScholarships,
-    refreshPool
+    distributeScholarships
   } = useContract(wallet);
 
   // Carousel state
@@ -96,11 +93,6 @@ function App() {
     setCurrentSlide(index);
   };
 
-  useEffect(() => {
-    if (isConnected && wallet && address) {
-      refreshPool();
-    }
-  }, [isConnected, wallet, address, refreshPool]);
 
   return (
     <div className="app">
@@ -519,12 +511,6 @@ function App() {
                     <li>
                       <strong>Public Key:</strong> 
                       <span>{wallet.publicKey.substring(0, 8)}...{wallet.publicKey.substring(wallet.publicKey.length - 8)}</span>
-                    </li>
-                  )}
-                  {address && (
-                    <li>
-                      <strong>Address:</strong> 
-                      <span>{address.substring(0, 8)}...{address.substring(address.length - 8)}</span>
                     </li>
                   )}
                 </ul>

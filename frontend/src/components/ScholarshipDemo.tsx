@@ -1,39 +1,9 @@
 import React, { useState } from 'react';
-import { ScholarshipActions } from './ScholarshipActions';
-import { ScholarshipPool } from '../types';
 
 export const ScholarshipDemo: React.FC = () => {
   const [currentView, setCurrentView] = useState<'overview' | 'pools' | 'applications'>('overview');
 
-  // Sample data for demonstration
-  const samplePools: ScholarshipPool[] = [
-    {
-      creator: "GABC123...",
-      token: "XLM",
-      total_goal: 10000000000, // 1000 XLM in stroops
-      current_balance: 6500000000, // 650 XLM in stroops
-      is_active: true,
-      max_scholarship_amount: 1000000000, // 100 XLM in stroops
-      min_scholarship_amount: 500000000, // 50 XLM in stroops
-      application_deadline: Math.floor(Date.now() / 1000) + (30 * 24 * 60 * 60), // 30 days from now
-      distribution_deadline: Math.floor(Date.now() / 1000) + (60 * 24 * 60 * 60), // 60 days from now
-    },
-    {
-      creator: "GDEF456...",
-      token: "XLM",
-      total_goal: 50000000000, // 5000 XLM in stroops
-      current_balance: 25000000000, // 2500 XLM in stroops
-      is_active: true,
-      max_scholarship_amount: 2000000000, // 200 XLM in stroops
-      min_scholarship_amount: 1000000000, // 100 XLM in stroops
-      application_deadline: Math.floor(Date.now() / 1000) + (45 * 24 * 60 * 60), // 45 days from now
-      distribution_deadline: Math.floor(Date.now() / 1000) + (75 * 24 * 60 * 60), // 75 days from now
-    }
-  ];
 
-  const handleExploreScholarships = () => {
-    setCurrentView('pools');
-  };
 
   const renderContent = () => {
     switch (currentView) {
@@ -42,23 +12,20 @@ export const ScholarshipDemo: React.FC = () => {
           <div className="pools-view">
             <h2>Available Scholarship Pools</h2>
             <div className="pools-grid">
-              {samplePools.map((pool, index) => (
-                <div key={index} className="pool-card">
-                  <h3>Pool {index + 1}</h3>
+                <div className="pool-card">
+                  <h3>Pool </h3>
                   <div className="pool-stats">
                     <div className="stat">
                       <span className="label">Goal:</span>
-                      <span className="value">{(pool.total_goal / 10000000).toFixed(0)} XLM</span>
+                      <span className="value"> XLM</span>
                     </div>
                     <div className="stat">
                       <span className="label">Raised:</span>
-                      <span className="value">{(pool.current_balance / 10000000).toFixed(0)} XLM</span>
+                      <span className="value"> XLM</span>
                     </div>
                     <div className="stat">
                       <span className="label">Progress:</span>
-                      <span className="value">
-                        {((pool.current_balance / pool.total_goal) * 100).toFixed(1)}%
-                      </span>
+
                     </div>
                   </div>
                   <button 
@@ -68,7 +35,6 @@ export const ScholarshipDemo: React.FC = () => {
                     View Applications
                   </button>
                 </div>
-              ))}
             </div>
             <button 
               className="btn-secondary"
@@ -113,11 +79,7 @@ export const ScholarshipDemo: React.FC = () => {
             <p className="subtitle">
               A blockchain-powered platform for transparent and efficient scholarship funding
             </p>
-            
-            <ScholarshipActions 
-              pools={samplePools}
-              onExploreScholarships={handleExploreScholarships}
-            />
+
             
             <div className="features">
               <div className="feature">
