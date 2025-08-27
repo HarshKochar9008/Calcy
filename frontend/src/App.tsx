@@ -101,7 +101,6 @@ function App() {
         <div className="navbar-container">
           <div className="navbar-brand">
             <div className="Title">EduChain</div>
-            <img src="/logo.png" alt="EduChain Logo" className="logo" />
             <span className="logo-subtitle">Blockchain Scholarships</span>
           </div>
           
@@ -182,7 +181,7 @@ function App() {
           <div className="hero-visual">
             <div className="hero-card">
               <div className="card-header">
-                <div className="card-icon"><img src="/hurray.png" alt="EduChain Logo" className="logo1" /></div>
+                <div className="card-icon"><img src="/image.png" alt="EduChain Logo" className="logo1" /></div>
                 <h3>Live Scholarship Pool</h3>
               </div>
               <div className="card-content">
